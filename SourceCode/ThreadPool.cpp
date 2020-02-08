@@ -136,11 +136,11 @@ void ThreadPool::terminateAllThreads() {
 		isWorking = 0;		//stop infinite while cycle
 
 		resumeAllThreads();
-	}
-
-	for (unsigned int i = 0; i < num_of_cores; i++) {
-		/*main thread is blocked until the threads return a number.
-		This will mean that the threads have successfully completed their functions*/
-		isTerminated[i].get();
+		
+		for (unsigned int i = 0; i < num_of_cores; i++) {
+			/*main thread is blocked until the threads return a number.
+			This will mean that the threads have successfully completed their functions*/
+			isTerminated[i].get();
+		}
 	}
 }

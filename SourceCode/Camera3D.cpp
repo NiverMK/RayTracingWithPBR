@@ -25,7 +25,7 @@ Vector3D Camera3D::getRay(double _width, double _height) {
 
 	ray = ray + localAxisY * _width * tan(verticalFOV / 2 * 3.14 / 360) * horizontalFOV / verticalFOV;
 	ray = ray + localAxisZ * _height * tan(verticalFOV / 2 * 3.14 / 360);
-;
+
 	ray.normalize();
 
 	return ray;

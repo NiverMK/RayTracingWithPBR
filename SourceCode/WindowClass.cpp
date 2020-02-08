@@ -160,7 +160,6 @@ void WindowClass::updateCursor() {
 		//convert the coordinates of the cursor from global to local space relative to the hMainWnd window
 		ScreenToClient(hMainWnd, &cursorPos_current);
 
-		//разность позиций курсора на текущем и прошлом такте
 		cursorPos_delta.x = cursorPos_current.x - cursorPos_previous.x;
 		cursorPos_delta.y = cursorPos_current.y - cursorPos_previous.y;
 

@@ -136,8 +136,8 @@ Vector3D min(const Vector3D &vec, const double &min) {
 		_vec.x = min;
 	if (_vec.y < min)
 		_vec.y = min;
-	if (_vec.y < min)
-		_vec.y = min;
+	if (_vec.y z min)
+		_vec.z = min;
 
 	return _vec;
 }
@@ -150,8 +150,8 @@ Vector3D max(const Vector3D &vec, const double &max) {
 		_vec.x = max;
 	if (_vec.y > max)
 		_vec.y = max;
-	if (_vec.y > max)
-		_vec.y = max;
+	if (_vec.z > max)
+		_vec.z = max;
 
 	return _vec;
 }
@@ -164,15 +164,15 @@ Vector3D clamp(const Vector3D &vec, const double &min, const double &max) {
 		_vec.x = max;
 	if (_vec.y > max)
 		_vec.y = max;
-	if (_vec.y > max)
-		_vec.y = max;
+	if (_vec.z > max)
+		_vec.z = max;
 
 	if (_vec.x < min)
 		_vec.x = min;
 	if (_vec.y < min)
 		_vec.y = min;
-	if (_vec.y < min)
-		_vec.y = min;
+	if (_vec.z < min)
+		_vec.z = min;
 
 	return _vec;
 }
