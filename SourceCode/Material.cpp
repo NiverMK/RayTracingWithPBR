@@ -1,59 +1,48 @@
 #include "Material.h"
+#include "Constants.h"
+#include "MaterialFunctions.h"
 
-
-Material::Material() { 
-
-	albedo = Vector3D(0.5); 
-	F0 = Vector3D(0.04); 
-	metalness = 0.0; 
-	roughness = 0.5; 
-
-	isDoubleSided = false; 
-
-	shader.material = this; 
+Material::Material()
+{ 
+	albedo = Vector3D(1.0); 
+	metalness = 1.0; 
+	roughness = 1.0; 
+	isDoubleSided = false;
+	materialFunction = &baseMaterialFunction;
 }
 
+Material::~Material()
+{
+}
 
-
-Material::Material(const Material &_material) {
+Material::Material(const Material &_material)
+{
 	albedo = _material.albedo;
-	F0 = _material.F0;
 	metalness = _material.metalness;
 	roughness = _material.roughness;
 	isDoubleSided = _material.isDoubleSided;
+	materialFunction = _material.materialFunction;
 }
 
-
-
-Material& Material::operator= (const Material &_material) {
+Material& Material::operator = (const Material& _material)
+{
 	albedo = _material.albedo;
-	F0 = _material.F0;
 	metalness = _material.metalness;
 	roughness = _material.roughness;
 	isDoubleSided = _material.isDoubleSided;
+	materialFunction = _material.materialFunction;
 
 	return *this;
 }
 
+MaterialData Material::getParameters(double u, double v) const
+{
+	MaterialData materialData = materialFunction(u, v);
 
+	materialData.albedo = materialData.albedo % albedo;
+	materialData.metalness = materialData.metalness * metalness;
+	materialData.roughness = std::clamp(materialData.roughness * roughness, ROUGHNESS_MIN, 1.0);
+	materialData.Fresnel = clamp(materialData.albedo * materialData.metalness, FRESNEL_MIN, 1.0);
 
-void Material::setAlbedo(const Vector3D &_albedo) {
-	albedo = _albedo;
-
-
-	F0 = clamp(albedo * metalness, 0.04, 1.0);
-}
-
-
-
-void Material::setMetalness(const double &_metalness) {
-	metalness = (std::clamp)(_metalness, 0.0, 1.0);
-
-	F0 = clamp(albedo * metalness, 0.04, 1.0);
-}
-
-
-
-void Material::setRoughness(const double &_roughness) {
-	roughness = (std::clamp)(_roughness, 0.01, 1.0);
+	return materialData;
 }

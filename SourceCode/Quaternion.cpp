@@ -1,8 +1,22 @@
+#include <algorithm>
 #include "Quaternion.h"
 #include "Vector3D.h"
 #include <math.h>
 
-Quaternion Quaternion :: operator + (const Quaternion &q) const {
+Quaternion::Quaternion(const double _w, const double _x, const double _y, const double _z)
+	: w(_w)
+	, x(_x)
+	, y(_y)
+	, z(_z) 
+{
+}
+
+Quaternion::~Quaternion()
+{
+}
+
+Quaternion Quaternion::operator + (const Quaternion& q) const
+{
 	Quaternion _q;
 	_q.w = w + q.w;
 	_q.x = x + q.x;
@@ -12,8 +26,8 @@ Quaternion Quaternion :: operator + (const Quaternion &q) const {
 	return _q;
 }
 
-
-Quaternion Quaternion :: operator - (const Quaternion &q) const {
+Quaternion Quaternion::operator - (const Quaternion& q) const
+{
 	Quaternion _q;
 	_q.w = w - q.w;
 	_q.x = x - q.x;
@@ -23,8 +37,8 @@ Quaternion Quaternion :: operator - (const Quaternion &q) const {
 	return _q;
 }
 
-
-Quaternion Quaternion :: operator * (const Quaternion &q) const {
+Quaternion Quaternion::operator * (const Quaternion& q) const
+{
 	Quaternion _q;
 	_q.w = w * q.w - x * q.x - y * q.y - z * q.z;
 	_q.x = w * q.x + x * q.w + y * q.z - z * q.y;
@@ -34,19 +48,19 @@ Quaternion Quaternion :: operator * (const Quaternion &q) const {
 	return _q;
 }
 
-
-Quaternion Quaternion :: operator * (const double &scale) const {
+Quaternion Quaternion::operator * (double scaler) const
+{
 	Quaternion _q;
-	_q.w = w * scale;
-	_q.x = x * scale;
-	_q.y = y * scale;
-	_q.z = z * scale;
+	_q.w = w * scaler;
+	_q.x = x * scaler;
+	_q.y = y * scaler;
+	_q.z = z * scaler;
 
 	return _q;
 }
 
-
-Quaternion Quaternion :: operator / (const double &divider) const {
+Quaternion Quaternion::operator / (double divider) const
+{
 	Quaternion _q;
 	_q.w = w / divider;
 	_q.x = x / divider;
@@ -56,23 +70,35 @@ Quaternion Quaternion :: operator / (const double &divider) const {
 	return _q;
 }
 
-
-Quaternion Quaternion::operator % (const Quaternion &q) const {
+Quaternion Quaternion::operator % (const Quaternion& q) const
+{
 	return Quaternion(w * q.w, x * q.x, y * q.y, z * q.z);
 }
 
+bool Quaternion::operator == (const Quaternion& q) const
+{
+	if (std::abs(w - q.w) > DBL_EPSILON)
+		return false;
 
-bool Quaternion::operator == (const Quaternion &q) const {
-	return (w == q.w) && (x == q.x) && (y == q.y) && (z == q.z);
+	if (std::abs(x - q.x) > DBL_EPSILON)
+		return false;
+
+	if (std::abs(y - q.y) > DBL_EPSILON)
+		return false;
+
+	if (std::abs(z - q.z) > DBL_EPSILON)
+		return false;
+
+	return true;
 }
 
-
-bool Quaternion::operator != (const Quaternion &q) const {
-	return (w != q.w) || (x != q.x) || (y != q.y) || (z != q.z);
+bool Quaternion::operator != (const Quaternion& q) const
+{
+	return !(*this == q);
 }
 
-
-Quaternion Quaternion :: operator * (const Vector3D &vec) const {
+Quaternion Quaternion::operator * (const Vector3D& vec) const
+{
 	Quaternion _q;
 	_q.w = - x * vec.x - y * vec.y - z * vec.z;
 	_q.x = w * vec.x + y * vec.z - z * vec.y;
@@ -82,41 +108,42 @@ Quaternion Quaternion :: operator * (const Vector3D &vec) const {
 	return _q;
 }
 
-
-Vector3D Quaternion::getVector() {
-	return Vector3D(x, y, z);
+void Quaternion::normalize()
+{
+	*this = *this / length();
 }
 
-
-double Quaternion::length() {
-	return sqrt(w * w + x * x + y * y + z * z);
-}
-
-
-void Quaternion::normalize() {
-	*this = *this / this->length();
-}
-
-void Quaternion::invert() {
+void Quaternion::invert()
+{
 	x = -x;
 	y = -y;
 	z = -z;
 }
 
-
-Quaternion Quaternion::getInverted() {
-
+Quaternion Quaternion::getInverted() const
+{
 	return Quaternion(w, -x, -y, -z);
 }
 
-
-Quaternion Quaternion::getNormalized() {
+Quaternion Quaternion::getNormalized() const
+{
 	Quaternion q = *this;
 	q = q / q.length();
+
 	return q;
 }
 
+Vector3D Quaternion::getVector() const
+{
+	return Vector3D(x, y, z);
+}
 
-double dot(const Quaternion &_q1, const Quaternion &_q2) {
-	return _q1.w * _q2.w + _q1.x * _q2.x + _q1.y * _q2.y + _q1.z * _q2.z;
+double Quaternion::length() const
+{
+	return sqrt(w * w + x * x + y * y + z * z);
+}
+
+double dot(const Quaternion& q1, const Quaternion& q2)
+{
+	return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
 }

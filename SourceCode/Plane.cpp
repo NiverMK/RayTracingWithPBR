@@ -1,31 +1,33 @@
 #include "Plane.h"
 
-
-Plane::Plane() {
-	width = 1;
-	length = 1;
+Plane::Plane()
+{
 }
 
-
-
-Plane::Plane(const Vector3D &_position, const double &_width, const double &_length) {
-	width = _width;
-	length = _length;
-
-	position = _position;
+Plane::Plane(const Vector3D &_position, double _width, double _length)
+	: Figure(_position)
+	, width(_width)
+	, length(_length)
+{
 }
 
+Plane::~Plane()
+{
+}
 
+FigureData Plane::isIntersectsRay(const Vector3D& origin, const Vector3D& direction)
+{
+	/*
+	Solving the equation to find intersetion point of the plane and the ray using Cramer's method
+	from left - ray's points, from right - plane's points
+	origin + direction * t = position + localAxisX * u + localAxizY * v 
+	localAxisX * u + localAxizY * v - direction * t = origin - position
+	*/
 
-std::tuple<Object3D *, Vector3D, double> Plane::isIntersectsRay(const Vector3D &origin, const Vector3D &direction) {
-	/*Solving the equation for finding the intersection point of the plane and the ray. Cramer's rule.
-	origin + direction * t = cornerPoint + localAxisX * u + localAxizY * v
-	localAxisX * u + localAxizY * v - direction * t = origin - cornerPoint */
-
-	//vector of free members
+	/* vector of a free members */
 	Vector3D valueVec = origin - position;
 
-	/*calculation of the determinant of a matrix consisting of coefficients for unknown u, v, t
+	/* calculate matrix determinant, coefficients of unknown u, v, t
 	|localAxisX.x	localAxisY.x	-direction.x|
 	|localAxisX.y	localAxisY.y	-direction.y|
 	|localAxisX.z	localAxisY.z	-direction.z|
@@ -34,8 +36,7 @@ std::tuple<Object3D *, Vector3D, double> Plane::isIntersectsRay(const Vector3D &
 		+ localAxisY.x * (localAxisX.z * (-direction.y) - localAxisX.y * (-direction.z))
 		- direction.x * (localAxisX.y * localAxisY.z - localAxisX.z * localAxisY.y);
 
-
-	/*calculation of the determinant of a matrix consisting of coefficients for unknown u, t and free members instead of coefficients for v
+	/* calculate matrix determinant, coefficients of unknown u, t and free member of v
 	|localAxisX.x	valueVec.x	-direction.x|
 	|localAxisX.y	valueVec.y	-direction.y|
 	|localAxisX.z	valueVec.z	-direction.z|
@@ -44,12 +45,15 @@ std::tuple<Object3D *, Vector3D, double> Plane::isIntersectsRay(const Vector3D &
 		+ valueVec.x * (localAxisX.z * (-direction.y) - localAxisX.y * (-direction.z))
 		- direction.x * (localAxisX.y * valueVec.z - localAxisX.z * valueVec.y);
 
+	/* calculate coefficient V */
 	double v = v_determinant / main_determinant;
+	v += length / 2.0;
 
-	if (v < -length / 2.0 || v > length / 2.0)
-		return { NULL, Vector3D(), -1 };			//the intersection point with the plane is outside the plain
+	/* if V is not inside [0; length], intersection point is outside the plane */
+	if (v < 0.0 || v > length)
+		return FigureData();
 
-	/*calculation of the determinant of a matrix consisting of coefficients for unknown v, t and free members instead of coefficients for u
+	/* calculate matrix determinant, coefficients of unknown v, t and free member of u
 	|valueVec.x		localAxisY.x	-direction.x|
 	|valueVec.y		localAxisY.y	-direction.y|
 	|valueVec.z		localAxisY.z	-direction.z|
@@ -58,12 +62,15 @@ std::tuple<Object3D *, Vector3D, double> Plane::isIntersectsRay(const Vector3D &
 		+ localAxisY.x * (valueVec.z * (-direction.y) - valueVec.y * (-direction.z))
 		- direction.x * (valueVec.y * localAxisY.z - valueVec.z * localAxisY.y);
 
+	/* calculate coefficient U */
 	double u = u_determinant / main_determinant;
+	u += width / 2.0;
 
-	if (u < -width / 2.0 || u > width / 2.0)
-		return { NULL, Vector3D(), -1 };			//the intersection point with the plane is outside the plain
+	/* if U is not inside [0; width], intersection point is outside the plane */
+	if (u < 0.0 || u > width)
+		return FigureData();
 
-	/*calculation of the determinant of a matrix consisting of coefficients for unknown u, v and free members instead of coefficients for t
+	/* calculate matrix determinant, coefficients of unknown u, v and free member of t
 	|localAxisX.x	localAxisY.x	valueVec.x|
 	|localAxisX.y	localAxisY.y	valueVec.y|
 	|localAxisX.z	localAxisY.z	valueVec.z|
@@ -72,21 +79,17 @@ std::tuple<Object3D *, Vector3D, double> Plane::isIntersectsRay(const Vector3D &
 		+ localAxisY.x * (localAxisX.z * valueVec.y - localAxisX.y * valueVec.z)
 		+ valueVec.x * (localAxisX.y * localAxisY.z - localAxisX.z * localAxisY.y);
 
-
+	/* calculate scaler T - length of a ray vector */
 	double t = t_determinant / main_determinant;
 
-	//Intersection point exists
-	return { this, localAxisZ, t };
-}
+	if (t < 0.0)
+	{
+		/* intersection point is behind the camera */
+		return FigureData();
+	}
 
+	FigureData data = { this, localAxisZ, t, u, v};
 
-
-void Plane::setWidth(const double &_width) {
-	width = _width;
-}
-
-
-
-void Plane::setLength(const double &_length) {
-	length = _length;
+	/* if figure is facing the camera, then return figure's data */
+	return isFacingRay(data, direction);
 }

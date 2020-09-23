@@ -1,0 +1,14 @@
+#pragma once
+
+#define PI 3.1415926535897
+#define DEGREES_TO_RADS 0.0174532925
+
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
+
+#define FAST_RENDER_PRESCALER 4
+
+#define GAMMA 2.2
+
+#define ROUGHNESS_MIN 0.01
+#define FRESNEL_MIN 0.04

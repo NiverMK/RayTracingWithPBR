@@ -1,51 +1,75 @@
+#include <cmath>
 #include "Camera3D.h"
+#include "Constants.h"
 
-
-Camera3D::Camera3D(const Vector3D &_position, const double &_fov) {
+Camera3D::Camera3D(const Vector3D& _position, double _fov)
+	: Object(_position)
+{
 	width = 1280;
 	height = 720;
 
-	position = _position;
 	setFOV(_fov);
 }
 
+Camera3D::~Camera3D()
+{
+}
 
+Vector3D Camera3D::getRay(size_t _width, size_t _height) const
+{
+	/* convert to interval [-1.0; 1.0] */
+	double w = -2.0 * _width + width;
+	w = w / width;
 
-Vector3D Camera3D::getRay(double _width, double _height) {
-	//camera direction vector
+	double h = -2.0 * _height + height;
+	h = h / height;
+
 	Vector3D ray = localAxisX;
 
-	//to interval [-1; 1]
-	_width = _width - width / 2;
-	_width = -2 * _width / width;
-
-	_height = _height - height / 2;
-	_height = -2 * _height / height;
-
-
-	ray = ray + localAxisY * _width * tan(verticalFOV / 2 * 3.14 / 360) * horizontalFOV / verticalFOV;
-	ray = ray + localAxisZ * _height * tan(verticalFOV / 2 * 3.14 / 360);
+	ray = ray + localAxisY * w * std::tan(verticalFOV / 2 * PI / 360.0) * horizontalFOV / verticalFOV;
+	ray = ray + localAxisZ * h * std::tan(verticalFOV / 2 * PI / 360.0);
 
 	ray.normalize();
 
 	return ray;
 }
 
+Vector3D Camera3D::getRayQuaternion(size_t _width, size_t _height) const
+{
+	Vector3D ray = localAxisX;
 
+	/* convert to interval [-0.5; 0.5] */
+	double w = _width - width / 2.0;
+	w = w / width;
 
-void Camera3D::setFOV(const double &_fov) {
-	//vertical fov
+	double h = _height - height / 2.0;
+	h = h / height;
+
+	/* rotation angles */
+	double angleZ = horizontalFOV * w;
+	double angleY = verticalFOV * h;
+
+	angleY *= DEGREES_TO_RADS;
+	angleZ *= DEGREES_TO_RADS;
+
+	Quaternion rotorY(std::cos(angleY / 2.0), std::sin(angleY / 2.0) * localAxisY.x, std::sin(angleY / 2.0) * localAxisY.y, std::sin(angleY / 2.0) * localAxisY.z);
+	Quaternion rotorZ(std::cos(angleZ / 2.0), std::sin(angleZ / 2.0) * localAxisZ.x, std::sin(angleZ / 2.0) * localAxisZ.y, std::sin(angleZ / 2.0) * localAxisZ.z);
+	
+	/* rotate */
+	ray = (rotorY * ray * rotorY.getInverted()).getVector();
+	ray = (rotorZ * ray * rotorZ.getInverted()).getVector();
+
+	return ray;
+}
+
+void Camera3D::setFOV(double _fov)
+{
 	verticalFOV = _fov;
 
-	//horizontal fov calculation
 	horizontalFOV = width * verticalFOV / height;
 }
 
-
-
-double Camera3D::getFOV() {
+double Camera3D::getFOV() const
+{
 	return verticalFOV;
 }
-
-
-

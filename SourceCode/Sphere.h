@@ -1,27 +1,17 @@
 #pragma once
 
-#include "Object3D.h"
+#include "Figure.h"
 
-class Sphere : public Object3D {
-
-protected:
-	Material material;
-
+class Sphere : public Figure
+{
 public:
 	double radius;
 
-	Sphere(const double &_radius = 1) : radius(_radius) { }
-	Sphere(const Vector3D &_position, const double &_radius = 1) : radius(_radius) { position = _position; }
+	Sphere(double _radius = 1.0);
+	Sphere(const Vector3D& _position, double _radius = 1.0);
+	~Sphere();
 
-	~Sphere() { }
-
-	//function determines whether the ray crosses the object
-	std::tuple<Object3D *, Vector3D, double> isIntersectsRay(const Vector3D &origin, const Vector3D &direction);
-
-	//set material
-	void setMaterial(const Material &_material) { material = _material; }
-
-	//get material pointer
-	Material *getMaterial() { return &material; }
+	/* find intersection point of ray and object. 
+	returns pointer to object, normal vector and scaler for ray to calculate point's coordinates */
+	FigureData isIntersectsRay(const Vector3D& origin, const Vector3D& direction);
 };
-

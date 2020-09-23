@@ -1,34 +1,26 @@
 #pragma once
 
-#include <math.h>
-#include "Object3D.h"
+#include "Object.h"
 
-
-class Camera3D : public Object3D {
+class Camera3D : public Object
+{
 public:
+	/* render size */
+	size_t width;
+	size_t height;
 
-	//render resolution
-	uint32_t width;
-	uint32_t height;
+	Camera3D(const Vector3D& _position = Vector3D(), double _fov = 60.0);
+	~Camera3D();
 
+	void setFOV(double _fov);
+	double getFOV() const;
 
-	Camera3D() { width = 1280; height = 720; setFOV(60); }
-	Camera3D(const Vector3D &_position, const double &_fov);
-
-	~Camera3D() {}
-
-	//set vertical FOV
-	void setFOV(const double &_fov);
-
-	double getFOV();
-
-
-	/*Returns the ray vector based on the pixel number*/
-	Vector3D getRay(double _width, double _height);
+	/* get casted ray from camera */
+	Vector3D getRay(size_t _width, size_t _height) const;
+	/* experemental */
+	Vector3D getRayQuaternion(size_t _width, size_t _height) const;
 
 protected:
-
 	double verticalFOV;
-
 	double horizontalFOV;
 };

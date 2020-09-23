@@ -1,36 +1,19 @@
 #pragma once
 
-#include "Object3D.h"
+#include "Figure.h"
 
-class Plane : public Object3D {
-protected:
-
-	//cube size
-	double width;
-	double length;	
-
-	Material material;
-
+class Plane : public Figure
+{
 public:
+	/* plane's width and length */
+	double width = 1.0;
+	double length = 1.0;
 
 	Plane();
-	Plane(const Vector3D &_position, const double &_width = 1, const double &_length = 1);
+	Plane(const Vector3D& _position, double _width = 1.0, double _length = 1.0);
+	~Plane();
 
-	~Plane() { }
-
-	void setWidth(const double &_width);
-	void setLength(const double &_length);
-
-	double getWidth() { return width; }
-	double getLength() { return length; }
-
-	//function determines whether the ray crosses the object
-	std::tuple<Object3D *, Vector3D, double> isIntersectsRay(const Vector3D &origin, const Vector3D &direction);
-
-	//set material
-	void setMaterial(const Material &_material) { material = _material; }
-
-	//get material pointer
-	Material *getMaterial() { return &material; }
+	/* find intersection point of ray and object. 
+	returns pointer to object, normal vector and scaler for ray to calculate point's coordinates */
+	FigureData isIntersectsRay(const Vector3D& origin, const Vector3D& direction);
 };
-

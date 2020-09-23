@@ -1,40 +1,28 @@
 #pragma once
 
 #include <algorithm>
-
 #include "Vector3D.h"
 #include "Shader.h"
+#include "ReturnData.h"
 
 class Material
 {
-private:
-	Vector3D albedo;	//[0...1]
-	Vector3D F0;		//Fresnel coefficient [0...1]
-	double metalness;	//[0...1]
-	double roughness;	//[0...1]
-
-
 public:
-	//is material double-sided
-	bool isDoubleSided;
-
-	Shader shader;
+	/* [0.0 ... 1.0] */
+	Vector3D albedo;
+	double metalness;
+	double roughness;
 
 	Material();
-	~Material() {}
+	~Material();
 
-	//copy constructor
-	Material(const Material &_material);
-	//operator = overload
-	Material &operator= (const Material &_material);
+	Material(const Material& _material);
 
+	Material& operator = (const Material& _material);
 
-	void setAlbedo(const Vector3D &_albedo);
-	void setMetalness(const double &_metalness);
-	void setRoughness(const double &_roughness);
+	MaterialData getParameters(double u = 0.0, double v = 0.0) const;
 
-	const Vector3D &getAlbedo() { return albedo; }
-	const Vector3D &getFresnel() { return F0; }
-	const double &getMetalness() { return metalness; }
-	const double &getRoughness() { return roughness; }
+	Shader shader;
+	bool isDoubleSided;
+	MaterialData(*materialFunction)(double u, double v) = nullptr;
 };

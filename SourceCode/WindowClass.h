@@ -1,47 +1,46 @@
 #pragma once
 
 #include "Vector3D.h"
-
 #include <windows.h>
 
-
-class WindowClass {
-
+class WindowClass
+{
 public:
+	/* main window */
+	HWND hMainWnd;
 
-	WindowClass(const unsigned int &width, const unsigned int &height);
-	~WindowClass();
-
-	HWND hMainWnd;		//main window
-
-	//size of window
+	/* window size */
 	unsigned int window_width;
 	unsigned int window_height;
 
-	POINT cursorPos_current;	//current position of cursor
-	POINT cursorPos_previous;	//last position
-	POINT cursorPos_delta;		//difference between current and last cursor positions
+	/* current, previous cursor position and difference between them */
+	POINT cursorPos_current;
+	POINT cursorPos_previous;
+	POINT cursorPos_delta;
 
-	bool isLMouseButtonPressed;	//is left mouse button pressed
+	bool isLMouseButtonPressed;
 
+	WindowClass(unsigned int width, unsigned int height);
+	~WindowClass();
+
+	/* create window function */
 	bool createWindow(HINSTANCE hInst, int nCmdShow);
-
-	void DrawBitmap(Vector3D *pixels_rgb, int xStart, int yStart);
-
+	/* draw bitmap in window */
+	void DrawBitmap(Vector3D* pixels_rgb, int xStart, int yStart);
+	/* update cursor data */
 	void updateCursor();
 
 protected:
-
-	unsigned char *pixels_bgra;	
-
+	/* pixels in bgra format */
+	unsigned char* pixels_bgra;
+	/* bitmap to draw in window */
 	HBITMAP hBitmap;
 
-	//window event handler
+	/* window event handler */
 	static LRESULT CALLBACK MainWinProc(HWND, UINT, WPARAM, LPARAM);
-
+	/* left mouse button click handler */
 	void leftMouseButtonDown();
 	void leftMouseButtonUp();
-
-	//from RGB to BRGA
-	void RGBtoBRGA(Vector3D *pixels_rgb, unsigned char *_pixels_bgra);
+	/* convert from RGB to BRGA */
+	void RGBtoBRGA(Vector3D* pixels_rgb, unsigned char* _pixels_bgra);
 };
